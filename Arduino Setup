@@ -1,0 +1,7 @@
+int servo1=3;
+int servo2=5;
+
+void setup() {
+  pinmode(servo1, OUTPUT); //sets up servos as outputs so they can be positioned.
+  pinmode(servo2, OUTPUT);
+  }
