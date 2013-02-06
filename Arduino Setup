@@ -1,7 +1,17 @@
 int servo1=3;
 int servo2=5;
+double counter;
+double photoresistor=1; //analog in chanel for photo resistor
+
 
 void setup() {
-  pinmode(servo1, OUTPUT); //sets up servos as outputs so they can be positioned.
+  pinmode(servo1, OUTPUT);      //sets up servos as outputs so they can be positioned.
   pinmode(servo2, OUTPUT);
-  }
+  pinmode(photoresistor, INPUT);
+  
+  
+  double counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
+}
+
+
+//calling python output stuff: Python :)
