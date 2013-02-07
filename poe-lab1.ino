@@ -23,7 +23,7 @@ void setup() {
   pinmode(photoresistor, INPUT);
   
   
-  double counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
+  counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
 //calling python output stuff: Python :)
