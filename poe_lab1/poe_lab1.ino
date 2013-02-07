@@ -2,6 +2,8 @@
 using a photoresistor. This interfaces with a Python 3 GUI and code which produces a graph in Python.
 
 Derek Redfern & Halie Murray-Davis
+
+coments are cool!!!!
 */
 
 //Get libraries: 
