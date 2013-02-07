@@ -20,18 +20,35 @@ Servo servo2;
 double data;
 double counter;       //MAYBE?????
 double photoresistor=1; //analog in chanel for photo resistor
+int stepSize;
 
 void setup() {
   servo1.attach(3);       //digital PWM pins for signal to the two servos
   servo2.attach(5);
   
   pinMode(photoresistor, INPUT);
-  
+  Serial.begin(9600);
   
   counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
-void loop(){}
+void loop(){
+  while (Serial.available() > 0) { //we have a command waiting!
+    
+  }
+  if(stepSize) {
+    
+  }
+
+}
+
+int readSerial() {
+  
+}
+
+void writeSerial() {
+  
+}
 
 //calling python output stuff: Python :)
 
