@@ -4,36 +4,30 @@ using a photoresistor. This interfaces with a Python 3 GUI and code which produc
 Derek Redfern & Halie Murray-Davis
 */
 
-//Get libraries: 
-#include<Servo.h>
-
 //Define global variables, set initial positions for motors to zero:
 
-double theta = 0;    //sets initial position so we can control servo's position range=[1,180].
-double phi = 0;
+int servo1=3;       //digital PWM pins for signal to the two servos.
+int servo2=5;
 
-Servo servo1;      //servos are servos
-Servo servo2;
+double theta1 = 0;    //sets initial position so we can control servo's position range=[1,180].
+double theta2 = 0;
 
-double data;
 double counter;       //MAYBE?????
+
 double photoresistor=1; //analog in chanel for photo resistor
 
+
 void setup() {
-  servo1.attach(3);       //digital PWM pins for signal to the two servos
-  servo2.attach(5);
-  
-  pinMode(photoresistor, INPUT);
+  pinmode(servo1, OUTPUT);      //sets up servos as outputs so they can be positioned.
+  pinmode(servo2, OUTPUT);
+  pinmode(photoresistor, INPUT);
   
   
   counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
-void loop(){}
-
 //calling python output stuff: Python :)
 
-/*
 void move1(PYTHON1) {
     if (PYTHON1==0) {
         end    
@@ -46,4 +40,3 @@ void move1(PYTHON1) {
     }
 }
 
-*/
