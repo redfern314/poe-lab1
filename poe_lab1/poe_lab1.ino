@@ -33,9 +33,10 @@ void setup() {
 }
 
 void loop(){
-  while (Serial.available() > 0) { //we have a command waiting!
+  Serial.println(5);
+  //while (Serial.available() > 0) { //we have a command waiting!
     
-  }
+  //}
   if(stepSize) {
     
   }
