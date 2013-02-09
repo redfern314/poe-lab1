@@ -2,8 +2,6 @@
 using a photoresistor. This interfaces with a Python 3 GUI and code which produces a graph in Python.
 
 Derek Redfern & Halie Murray-Davis
-
-coments are cool!!!!
 */
 
 //Get libraries: 
@@ -18,7 +16,8 @@ double phi = 0;
 
 Servo servo1;      //servos are servos
 Servo servo2;
-int pos;
+int pos; //posions for motors
+int pos2;
 
 //double data;
 double counter;       //MAYBE?????
@@ -43,6 +42,28 @@ void setup() {
   counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
+void movement(){
+  for(pos=0; pos<180; pos = pos + precision) {
+    servo1.write(pos);
+    delay (50*precision^-1);
+        if ((pos==0 || pos==180) && (pos2==(180-(angle/2)) || pos2==(90-(angle/2)))) {
+          pos2=pos2+precision;
+          servo2.write(pos2);
+          delay (15);
+        }
+    }
+    
+  for (pos=180; pos>0; pos=pos - precision) {
+    servo1.write(pos);
+    delay (50*precision^-1);
+        if ( (pos==0 || pos==180) && (pos2==(180-(angle/2)) || pos2==(90-(angle/2))) ) {
+          pos2=pos2+precision;
+          servo2.write(pos2);
+          delay (15);
+        }
+  }
+}
+
 void loop(){
   portOne.listen();
   Serial.println("Data from port one:");
@@ -62,62 +83,7 @@ void loop(){
       int B = (int) (b);
       angle='A' + 'B';
       Serial.print(angle);
-      
-      for(pos=0; pos<180; pos = pos + precision) {
-        servo1.write(pos);
-        delay (50*precision^-1);
-      }
-      
-      
-          
+       
+      movement();  //calls previously defined movement function.
     }
-    else {}
-    
-    //Serial.print(data);
-    /*if portOne(1)==1{
-    
-    }
-    else {
-      end
-    }
-    */
-  }
-
-}
-
-
-/*
-void loop(){
-  while (Serial.available() > 0) { //we have a command waiting!
-    
-  }
-  if(stepSize) {
-    
-  }
-
-}
-
-int readSerial() {
-  
-}
-
-void writeSerial() {
-  
-}
-
-//calling python output stuff: Python :)
-
-/*
-void move1(PYTHON1) {
-    if (PYTHON1==0) {
-        end    
-    }
-
-    else {
-      for (theta1<=180) {
-          theta1++
-      }
-    }
-}
-
-*/
+    else {}}}
