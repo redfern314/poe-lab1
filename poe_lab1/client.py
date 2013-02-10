@@ -10,24 +10,23 @@ def connectToArduino():
     #loop through avail serial ports
     connected=False
 
-    for i in range(100):
-        available=findAvailPorts()
+    
+    available=findAvailPorts()
+    for avail in available:
+        s=serial.Serial(avail, 9600, timeout=1)
         msg=""
-        for avail in available:
-            s=serial.Serial(avail, 9600, timeout=1)
+        r=""
+        for i in range(100000):
             w=s.inWaiting()
-            
-            r=""
-            while w>0 and r!='\n':
-                msg+=r
-                r=s.read(1)
-                w=s.inWaiting()   
 
-            print msg
-            if(msg.strip()=='Arduino Ready' or msg.strip()=='Connected\n'):
-                #connected=True
-                print avail+': '+msg.strip()+'!!!!'
+            while w>0 and r!='\n':
+                r=s.read(1)
+                msg+=r
+                w=s.inWaiting() 
+
+            if(msg.strip()=='Arduino Ready'):
                 s.write('Python Ready\n')
+                return s
 
             if r=='\n':
                 msg=""  

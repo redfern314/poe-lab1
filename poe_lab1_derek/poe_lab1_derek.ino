@@ -14,6 +14,8 @@ coments are cool!!!!
 double theta = 0;    //sets initial position so we can control servo's position range=[1,180].
 double phi = 0;
 
+int led = 13;
+
 Servo servo1;      //servos are servos
 Servo servo2;
 
@@ -25,6 +27,7 @@ int stepSize;
 void setup() {
   servo1.attach(3);       //digital PWM pins for signal to the two servos
   servo2.attach(5);
+  pinMode(led, OUTPUT);
   
   pinMode(photoresistor, INPUT);
   Serial.begin(9600);
@@ -44,9 +47,10 @@ boolean stringComplete = false;
 
 void loop(){
   if (stringComplete) {
-    Serial.println("Connected");
-  } else {
-    Serial.println("Arduino Ready");
+    Serial.println("Received!");
+    stringComplete=false;
+    digitalWrite(led, HIGH);
+    //handle command here
   }
   delay(30);
 }
