@@ -24,6 +24,8 @@ double counter;       //MAYBE?????
 double photoresistor=1; //analog in chanel for photo resistor
 int stepSize;
 SoftwareSerial portOne (0,1);
+int i=0; //counter for data acquision from photo resistor.
+double vectorsend;
 
 //stuff from serial port:
 //char start;
@@ -62,6 +64,16 @@ void movement(){
           delay (15);
         }
   }
+  
+  if (pos2>=0 && pos2<=180) {
+    
+    
+    for (int i=0; i<300; i=i+(round(precision/20)) ){
+      double light=analogRead(photoresistor);
+      vectorsend[0]=light;
+    }
+
+  }
 }
 
 void loop(){
@@ -85,5 +97,6 @@ void loop(){
       Serial.print(angle);
        
       movement();  //calls previously defined movement function.
+      
     }
     else {}}}
