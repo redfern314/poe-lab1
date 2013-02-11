@@ -24,7 +24,7 @@ class Form(QDialog):
         layout3 = QHBoxLayout()
         layout4 = QHBoxLayout()
         label1 = QLabel("Scan step size:\n(1<=x<=50)")
-        label2 = QLabel("Maximum scan angle:\n(0<x<=90)")
+        label2 = QLabel("Maximum scan angle:\n(0<=x<=90)")
         self.status = QLabel("Status: Waiting for connection")
         mainlayout.addLayout(layout1)
         mainlayout.addLayout(layout2)
@@ -48,10 +48,24 @@ class Form(QDialog):
         self.plot.clicked.connect(self.makePlot)
         self.arduinoConnect.clicked.connect(self.connectToArduino)
         self.serial=None
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.readData)
+
+        self.tempdata = ""
        
     # Greets the user
     def greetings(self):
-        print ("Hello %s" % self.edit.text())    
+        print ("Hello")
+
+    def readData(self):
+        while self.serial.inWaiting()>0:
+            r=self.serial.read(1)
+            if(r=='\n'):
+                print self.tempdata
+                self.tempdata=""
+            else:
+                self.tempdata+=r
 
     def connectToArduino(self):
         s=client.connectToArduino()
@@ -62,8 +76,26 @@ class Form(QDialog):
             self.serial=s
 
     def startScan(self):
-        #
-        pass
+        #validate fields
+        precision_text=str(self.precision.text())
+        angle_text=str(self.angle.text())
+        if((not self.is_numeric(precision_text)) or (not self.is_numeric(angle_text))):
+            msgBox=QMessageBox()
+            msgBox.setText("Please enter valid numeric values.")
+            msgBox.exec_()
+        else:
+            precision=int(precision_text)
+            angle=int(angle_text)
+            if(precision<1 or precision>50 or angle<0 or angle>90):
+                msgBox=QMessageBox()
+                msgBox.setText("Please enter valid values.")
+                msgBox.exec_()
+            else:
+                cmd="1"+"{0:02d}".format(precision)+"{0:02d}".format(angle)+'\n'
+                print cmd.strip()
+                self.serial.write(cmd)
+                self.tempdata = ""
+                self.timer.start(10)
 
     def abortScan(self):
         self.serial.write("0\n")
@@ -71,6 +103,13 @@ class Form(QDialog):
 
     def makePlot(self):
         pass
+
+    def is_numeric(self, s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
  
  
 if __name__ == '__main__':

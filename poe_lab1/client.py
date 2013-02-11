@@ -4,6 +4,9 @@
 import serial #serial library
 from serial.tools import list_ports
 import sys
+from pylab import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 def connectToArduino():
     pass #dummy code
@@ -46,3 +49,35 @@ def findAvailPorts():
             pass
 
     return available
+
+def showHeatMap(data):
+    r=np.array(data[1])
+    theta=np.array(data[0])
+    x=r*np.cos(theta)
+    y=r*np.sin(theta)
+    xmin = x.min()
+    xmax = x.max()
+    ymin = y.min()
+    ymax = y.max()
+    plt.subplots_adjust(hspace=0.5)
+    plt.subplot(111)
+    plt.hexbin(x,y,C=data[2], cmap=plt.cm.hot)
+    plt.axis([xmin, xmax, ymin, ymax])
+    plt.title("Light Source Heat Map")
+    cb = plt.colorbar()
+    cb.set_label('counts')
+
+    plt.show()
+
+if __name__ == '__main__':
+    a=[]
+    b=[]
+    c=[]
+    for i in range(360):
+        for j in range(30):
+            a.append(i)
+            b.append(j*3)
+            c.append(5*rand(1))
+
+    a=[a,b,c]
+    showHeatMap(a)

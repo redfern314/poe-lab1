@@ -15,17 +15,22 @@ double phi = 0;
 
 Servo servo1;      //servos are servos
 Servo servo2;
-int pos; //posions for motors
+int pos; //positions for motors
 int pos2;
+
+int led = 13;
 
 String data;
 double photoresistor=1; //analog in chanel for photo resistor
 int i=0; //counter for data acquision from photo resistor.
 
+String inputString="";
+boolean stringComplete = false;
+
 //stuff from serial port:
 char start;
-int precision;
-int angle;
+int precision=10;
+int angle=30;
 
 
 void setup() {
@@ -33,57 +38,85 @@ void setup() {
   servo1.attach(3);       //digital PWM pins for signal to the two servos
   servo2.attach(5);
   pinMode(photoresistor, INPUT);    //set photoresisstor up as an input
+  pinMode(led, OUTPUT);
+  
+  
+  while (Serial.available() <= 0) { //wait for a response
+      Serial.println("Arduino Ready");   // send a starting message
+      delay(300);
+  }
 }
 
 void movement(){        //define a function which will move the servos in a specified pattern.
-  for(pos==0; pos<180; pos = pos + round(precision/9)) {    //Step through an arch for the bottom servo.
+  for(pos==0; pos<=180; pos = pos + round(precision/9)) {    //Step through an arch for the bottom servo.
     servo1.write(pos);
     delay (50/precision);
+    returndata();
         if ((pos==0 || pos==180)){    //move the photo resistor up a step (size of which is determined by the percision value) at ends of arc.
             delay (70);
             pos2=pos2+precision;
             servo2.write(pos2);
             delay (30);
+            returndata();
         }
     }
     
-  for (pos==180; pos>0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
+  for (pos==180; pos>=0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
     servo1.write(pos);
     delay (50/precision);
-      if (pos2==(180-(angle/2)) || pos2==(90-(angle/2)))  {
+    returndata();
+      if (pos==0 || pos2==180)  {
       pos2=pos2+precision;
       servo2.write(pos2);
       delay (30);
+      returndata();
       }
   }
 }
 
 void returndata(){      //sets up a function which writes data to the serial port so we can use it in the python code to make a graph.
     int light=analogRead(photoresistor);    //reads the light from the photoresistor.
-    String e = String (pos);      //change the position integers into strings:
+    /*String e = String (pos);      //change the position integers into strings:
+    while(e.length()<3){
+      e="0"+e;
+    }
     String f = String (pos2); 
+    while(f.length()<3){
+      f="0"+f;
+    }
     String g = String (light);
+    while(g.length()<4){
+      g="0"+g;
+    }
     String data = e+f+g;      //combines the strings into a single sting
-    Serial.println(data);     //prints data to the serial port
+    Serial.println(data);     //prints data to the serial port*/
+    Serial.print(pos);
+    Serial.print(pos2);
+    Serial.println(light);
 }
 
 void loop(){
-  Serial.println("Data from port one:");    
-    if (Serial.read()>=0) {
-      
-      char c=Serial.read();
-      char d=Serial.read();
-      int C=(int) (c);
-      int D=(int) (d);
-      precision= 'C' + 'D';
-      
-      char a=Serial.read();
-      char b=Serial.read();
-      int A= (int) (a); 
-      int B = (int) (b);
-      angle='A' + 'B';
-      Serial.print(angle);
-    }    
-     movement();  //calls previously defined movement function.
-     returndata();
+  if (stringComplete) {
+    stringComplete=false;
+    if(inputString[0]=='1') {
+      //TODO: extract new vars
+      digitalWrite(led, HIGH);
+      movement(); //calls previously defined movement function.
     }
+    inputString="";
+  }
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+    } 
+  }
+}
