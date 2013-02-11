@@ -5,8 +5,7 @@ Derek Redfern & Halie Murray-Davis
 */
 
 //Get libraries: 
-#include<Servo.h>
-#include <SoftwareSerial.h>;
+#include<Servo.h>;
 #include <stream.h>;
 
 //Define global variables, set initial positions for motors to zero:
@@ -19,16 +18,14 @@ Servo servo2;
 int pos; //posions for motors
 int pos2;
 
-//double data;
-double counter;       //MAYBE?????
+double data;
 double photoresistor=1; //analog in chanel for photo resistor
 int stepSize;
-SoftwareSerial portOne (0,1);
 int i=0; //counter for data acquision from photo resistor.
 double vectorsend;
 
 //stuff from serial port:
-//char start;
+char start;
 int precision=10;
 int angle=30;
 
@@ -37,11 +34,7 @@ void setup() {
   Serial.begin(9600);
   servo1.attach(3);       //digital PWM pins for signal to the two servos
   servo2.attach(5);
-  portOne.begin(9600); //could need a while statement but ex says needed only for Leonardo...
   pinMode(photoresistor, INPUT);
-  
-  
-  counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
 void movement(){
@@ -49,12 +42,10 @@ void movement(){
     servo1.write(pos);
     delay (50/precision);
         if ((pos==0 || pos==180)){
-         // if ((pos2==(180-(angle/2)) || pos2==(90-(angle/2)))) {
             delay (70);
             pos2=pos2+precision;
             servo2.write(pos2);
             delay (30);
-         //}
         }
     }
     
@@ -80,10 +71,7 @@ void movement(){
   } */
 
 void loop(){
-  portOne.listen();
-  Serial.println("Data from port one:");
-  while (portOne.available()>0) {
-    
+  Serial.println("Data from port one:");    
     if (Serial.read()>=0) {
       
       char c=Serial.read();
@@ -98,7 +86,6 @@ void loop(){
       int B = (int) (b);
       angle='A' + 'B';
       Serial.print(angle);
-    }
-  }    
+    }    
      movement();  //calls previously defined movement function.
     }
