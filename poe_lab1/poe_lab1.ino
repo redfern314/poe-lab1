@@ -23,7 +23,7 @@ int led = 13;
 boolean runScan = false;
 
 String data;
-double photoresistor=1; //analog in chanel for photo resistor
+double photoresistor=A0; //analog in chanel for photo resistor
 int i=0; //counter for data acquision from photo resistor.
 
 String inputString="";
