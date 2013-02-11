@@ -8,14 +8,13 @@ from pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-def connectToArduino():
-    pass #dummy code
+def connectToArduino():         #code to connect to the arduino through the serial port: 
     #loop through avail serial ports
-    connected=False
+    connected=False     #doesn't do anything until it finds an open serial port.        
 
     
-    available=findAvailPorts()
-    for avail in available:
+    available=findAvailPorts()      #works with function defined below to find the available serial ports
+    for avail in available:         #Takes the available ports found and processes them so they can be used to communicate with the Arduino
         s=serial.Serial(avail, 9600, timeout=1)
         msg=""
         r=""
@@ -27,39 +26,39 @@ def connectToArduino():
                 msg+=r
                 w=s.inWaiting() 
 
-            if(msg.strip()=='Arduino Ready'):
+            if(msg.strip()=='Arduino Ready'):       #when it has a port ready, it displays message that the arduino and python are ready.
                 s.write('Python Ready\n')
                 return s
 
-            if r=='\n':
+            if r=='\n':         #if it doesn't have a port readyt , it doesn't display any message.
                 msg=""  
 
     return None
 
 def findAvailPorts():
-    available=[]
-    ports = list_ports.comports()
+    available=[]        #sets the available ports as an empty array. 
+    ports = list_ports.comports()       #function from a library which finds available ports.
 
-    for i in range(len(ports)):
+    for i in range(len(ports)):         #tries all the serial ports and returns the ones which are open.
         try:
             s = serial.Serial(ports[i][0], 9600, timeout=1)
-            available.append(ports[i][0])
+            available.append(ports[i][0])       #Adds open ports to the array
             s.close()
         except serial.SerialException:
             pass
 
-    return available
+    return available        #Function returns the available ports so it can be used by the above function: connecttoArduino.
 
-def showHeatMap(data):
-    r=np.array(data[1])
-    theta=np.array(data[0])
-    x=r*np.cos(theta)
+def showHeatMap(data):      #code to produce a graph of the intensity of light around the room.
+    r=np.array(data[1])     #radius from polar coordinate position sent from Arduino.
+    theta=np.array(data[0]) #angle position, sent from arduino.
+    x=r*np.cos(theta)       #converting to rectangular:
     y=r*np.sin(theta)
-    xmin = x.min()
+    xmin = x.min()      #setting axies bounds:
     xmax = x.max()
     ymin = y.min()
     ymax = y.max()
-    plt.subplots_adjust(hspace=0.5)
+    plt.subplots_adjust(hspace=0.5)     #setting the third dimension of the plot, intensity:
     plt.subplot(111)
     plt.hexbin(x,y,C=data[2], cmap=plt.cm.hot)
     plt.axis([xmin, xmax, ymin, ymax])
@@ -68,16 +67,3 @@ def showHeatMap(data):
     cb.set_label('counts')
 
     plt.show()
-
-if __name__ == '__main__':
-    a=[]
-    b=[]
-    c=[]
-    for i in range(360):
-        for j in range(30):
-            a.append(i)
-            b.append(j*3)
-            c.append(5*rand(1))
-
-    a=[a,b,c]
-    showHeatMap(a)
