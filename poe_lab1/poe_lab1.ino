@@ -61,19 +61,12 @@ void movement(){
   for (pos==180; pos>0; pos = pos - round(precision/9)) {
     servo1.write(pos);
     delay (50/precision);
-       // if ( (pos==0 || pos==180) ){
           delay (30);
            if (pos2==(180-(angle/2)) || pos2==(90-(angle/2)))  {
               pos2=pos2+precision;
               servo2.write(pos2);
               delay (30);
-        }} //}
-  
-  /*if (pos2==angle){
-    pos=0;
-    pos2=0;
-  }
-  */
+        }}
 }
  /* 
   if (pos2>=0 && pos2<=180) {
