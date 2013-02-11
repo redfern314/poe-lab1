@@ -44,7 +44,7 @@ void setup() {
   counter=0;       //defining variables. *counter not necessary, yet, but I think we'll need it.
 }
 
-void loop() { //movement(){
+void movement(){
   for(pos==0; pos<180; pos = pos + round(precision/9)) {
     servo1.write(pos);
     delay (50/precision);
@@ -86,12 +86,12 @@ void loop() { //movement(){
 
   } */
 
-//void loop(){
- // portOne.listen();
-  //Serial.println("Data from port one:");
-  //while (portOne.available()>0) {
+void loop(){
+  portOne.listen();
+  Serial.println("Data from port one:");
+  while (portOne.available()>0) {
     
-    /*if (Serial.read()>=0) {
+    if (Serial.read()>=0) {
       
       char c=Serial.read();
       char d=Serial.read();
@@ -104,10 +104,8 @@ void loop() { //movement(){
       int A= (int) (a); 
       int B = (int) (b);
       angle='A' + 'B';
-      Serial.print(angle);}*/
-       
-      //movement();  //calls previously defined movement function.
- // }
-      
-    //}
-    //else {}}}
+      Serial.print(angle);
+    }
+  }    
+     movement();  //calls previously defined movement function.
+    }
