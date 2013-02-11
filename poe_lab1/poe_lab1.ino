@@ -18,7 +18,7 @@ Servo servo2;
 int pos; //posions for motors
 int pos2;
 
-double data;
+String data;
 double photoresistor=1; //analog in chanel for photo resistor
 int stepSize;
 int i=0; //counter for data acquision from photo resistor.
@@ -26,8 +26,8 @@ double vectorsend;
 
 //stuff from serial port:
 char start;
-int precision=10;
-int angle=30;
+int precision;
+int angle;
 
 
 void setup() {
@@ -57,18 +57,18 @@ void movement(){
               pos2=pos2+precision;
               servo2.write(pos2);
               delay (30);
-        }}
+           }
+  }
 }
- /* 
-  if (pos2>=0 && pos2<=180) {
-    
-    
-    for (int i=0; i<300; i=i+(round(precision/20)) ){
-      double light=analogRead(photoresistor);
-      vectorsend[0]=light;
-    }
 
-  } */
+void returndata(){
+    int light=analogRead(photoresistor);
+    String e = String (pos); 
+    String f = String (pos2); 
+    String g = String (light);
+    String data = e+f+g;
+    Serial.println(data);
+}
 
 void loop(){
   Serial.println("Data from port one:");    
@@ -88,4 +88,5 @@ void loop(){
       Serial.print(angle);
     }    
      movement();  //calls previously defined movement function.
+     returndata();
     }
