@@ -20,6 +20,8 @@ int pos2;
 
 int led = 13;
 
+boolean runScan = false;
+
 String data;
 double photoresistor=1; //analog in chanel for photo resistor
 int i=0; //counter for data acquision from photo resistor.
@@ -61,49 +63,53 @@ void movement(){        //define a function which will move the servos in a spec
         }
     }
     
-  for (pos==180; pos>=0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
+  for (pos==180; pos>0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
     servo1.write(pos);
     delay (50/precision);
     returndata();
       if (pos==0 || pos2==180)  {
-      pos2=pos2+precision;
-      servo2.write(pos2);
-      delay (30);
-      returndata();
+        pos2=pos2+precision;
+        servo2.write(pos2);
+        delay (30);
+        returndata();
       }
+  }
+  if(pos2>=180) {
+    pos=0;
+    pos2=0;
+    servo1.write(pos);
+    servo2.write(pos2);
+    Serial.print("@");
+    runScan=false;
   }
 }
 
 void returndata(){      //sets up a function which writes data to the serial port so we can use it in the python code to make a graph.
     int light=analogRead(photoresistor);    //reads the light from the photoresistor.
-    /*String e = String (pos);      //change the position integers into strings:
-    while(e.length()<3){
-      e="0"+e;
-    }
-    String f = String (pos2); 
-    while(f.length()<3){
-      f="0"+f;
-    }
-    String g = String (light);
-    while(g.length()<4){
-      g="0"+g;
-    }
-    String data = e+f+g;      //combines the strings into a single sting
-    Serial.println(data);     //prints data to the serial port*/
     Serial.print(pos);
+    Serial.print("|");
     Serial.print(pos2);
-    Serial.println(light);
+    Serial.print("|");
+    Serial.print(light);
+    Serial.print("\n");
 }
 
 void loop(){
   if (stringComplete) {
     stringComplete=false;
-    if(inputString[0]=='1') {
+    if(inputString[0]=='0') {
+      runScan=false;
+    } else if(inputString[0]=='1') {
       //TODO: extract new vars
+      runScan=true;
+      pos=0;
+      pos2=0;
       digitalWrite(led, HIGH);
-      movement(); //calls previously defined movement function.
     }
     inputString="";
+  }
+  if (runScan) {
+    movement(); //calls previously defined movement function.
   }
 }
 

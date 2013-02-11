@@ -2,6 +2,7 @@ import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 import client
+import re
 
 class Form(QDialog):
    
@@ -53,17 +54,21 @@ class Form(QDialog):
         self.timer.timeout.connect(self.readData)
 
         self.tempdata = ""
-       
-    # Greets the user
-    def greetings(self):
-        print ("Hello")
+        self.data = [[],[],[]]
 
     def readData(self):
         while self.serial.inWaiting()>0:
             r=self.serial.read(1)
             if(r=='\n'):
-                print self.tempdata
+                [[pos1,pos2,light]]=re.findall("(.*)\|(.*)\|(.*)", self.tempdata.strip())
+                self.data[0].append(pos1)
+                self.data[1].append(pos2)
+                self.data[2].append(light)
                 self.tempdata=""
+            elif(r=='@'):
+                self.timer.stop()
+                self.status.setText("Scan successful!")
+                #print self.data
             else:
                 self.tempdata+=r
 
@@ -95,14 +100,26 @@ class Form(QDialog):
                 print cmd.strip()
                 self.serial.write(cmd)
                 self.tempdata = ""
+                self.data = [[],[],[]]
                 self.timer.start(10)
+                self.status.setText("Scanning......")
 
     def abortScan(self):
         self.serial.write("0\n")
-        pass
+        self.status.setText("ABORT")
 
     def makePlot(self):
-        pass
+        self.parseAngles()
+        client.showHeatMap(self.data)
+
+    def parseAngles(self):
+        self.data[0]=map(int, self.data[0])
+        self.data[1]=map(int, self.data[1])
+        self.data[2]=map(int, self.data[2])
+        for i in range(len(self.data[0])):
+            if(self.data[1][i]>90):
+                self.data[1][i]=180-self.data[1][i]
+                self.data[0][i]+=180
 
     def is_numeric(self, s):
         try:
