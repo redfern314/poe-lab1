@@ -1,10 +1,13 @@
-import sys
+#code to create a GUI for a room light sensing device which allows the user to control the precision and 
+# angle of the scan and abort it. It also gives them a button to connect to the arduino.
+
+import sys      #inport libraries:
 from PySide.QtCore import *
 from PySide.QtGui import *
 import client
 import re
 
-class Form(QDialog):
+class Form(QDialog):        #sets the form for the GUI which will be created later.
    
     def __init__(self, parent=None):
         super(Form, self).__init__(parent)
@@ -56,35 +59,35 @@ class Form(QDialog):
         self.tempdata = ""
         self.data = [[],[],[]]
 
-    def readData(self):
+    def readData(self):     #creates the GUI based on the form created above:
         while self.serial.inWaiting()>0:
             r=self.serial.read(1)
             if(r=='\n'):
                 [[pos1,pos2,light]]=re.findall("(.*)\|(.*)\|(.*)", self.tempdata.strip())
-                self.data[0].append(pos1)
+                self.data[0].append(pos1)       #set values to the buttons:
                 self.data[1].append(pos2)
                 self.data[2].append(light)
                 self.tempdata=""
             elif(r=='@'):
                 self.timer.stop()
-                self.status.setText("Scan successful!")
+                self.status.setText("Scan successful!")     #displays message when scann is successful
                 #print self.data
             else:
-                self.tempdata+=r
+                self.tempdata+=r        #does nothing if scan wasn't successful.
 
     def connectToArduino(self):
-        s=client.connectToArduino()
+        s=client.connectToArduino()             #code to connect to arduino when the connect button is pushed. Also aborts when the abort button is pushed:
         if(s!=None):
             self.status.setText("Status: Connected!")
             self.start.setEnabled(True)
             self.abort.setEnabled(True)
             self.serial=s
 
-    def startScan(self):
+    def startScan(self):        #starts the scan when the start scan button is pushed:
         #validate fields
         precision_text=str(self.precision.text())
         angle_text=str(self.angle.text())
-        if((not self.is_numeric(precision_text)) or (not self.is_numeric(angle_text))):
+        if((not self.is_numeric(precision_text)) or (not self.is_numeric(angle_text))):         #checks entries into GUI fields for compatibility:
             msgBox=QMessageBox()
             msgBox.setText("Please enter valid numeric values.")
             msgBox.exec_()
@@ -96,7 +99,7 @@ class Form(QDialog):
                 msgBox.setText("Please enter valid values.")
                 msgBox.exec_()
             else:
-                cmd="1"+"{0:02d}".format(precision)+"{0:02d}".format(angle)+'\n'
+                cmd="1"+"{0:02d}".format(precision)+"{0:02d}".format(angle)+'\n'        #If entries are corrects, begins cand and displays message telling user it's scanning:
                 print cmd.strip()
                 self.serial.write(cmd)
                 self.tempdata = ""
@@ -104,15 +107,15 @@ class Form(QDialog):
                 self.timer.start(10)
                 self.status.setText("Scanning......")
 
-    def abortScan(self):
+    def abortScan(self):        # aborts scann if abort utton is pushed and it is called:
         self.serial.write("0\n")
         self.status.setText("ABORT")
 
-    def makePlot(self):
+    def makePlot(self):         #Makes plot when called:
         self.parseAngles()
         client.showHeatMap(self.data)
 
-    def parseAngles(self):
+    def parseAngles(self):      #turns the angle data recieved from the servo into something inteligable for the graph:
         self.data[0]=map(int, self.data[0])
         self.data[1]=map(int, self.data[1])
         self.data[2]=map(int, self.data[2])
@@ -121,7 +124,7 @@ class Form(QDialog):
                 self.data[1][i]=180-self.data[1][i]
                 self.data[0][i]+=180
 
-    def is_numeric(self, s):
+    def is_numeric(self, s):        #checks to make sure GUI field entries are integers when called:
         try:
             int(s)
             return True
@@ -129,7 +132,7 @@ class Form(QDialog):
             return False
  
  
-if __name__ == '__main__':
+if __name__ == '__main__':          #Runs when you run the file. The main function:
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
