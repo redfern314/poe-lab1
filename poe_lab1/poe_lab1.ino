@@ -63,16 +63,16 @@ void movement(){        //define a function which will move the servos in a spec
         }
     }
     
-  for (pos==180; pos>0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
+  for (pos==180; pos>=0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
     servo1.write(pos);
     delay (50/precision);
     returndata();
-      if (pos==0 || pos2==180)  {
+      /*if (pos==0)  {
         pos2=pos2+precision;
         servo2.write(pos2);
         delay (30);
         returndata();
-      }
+      }*/
   }
   if(pos2>=180) {
     pos=0;
@@ -85,7 +85,7 @@ void movement(){        //define a function which will move the servos in a spec
 }
 
 void returndata(){      //sets up a function which writes data to the serial port so we can use it in the python code to make a graph.
-    int light=analogRead(photoresistor);    //reads the light from the photoresistor.
+    int light=map(analogRead(photoresistor), 900, 1000, 0, 100);    //reads the light from the photoresistor.
     Serial.print(pos);
     Serial.print("|");
     Serial.print(pos2);
@@ -101,10 +101,10 @@ void loop(){
       runScan=false;
     } else if(inputString[0]=='1') {
       //TODO: extract new vars
+      
       runScan=true;
       pos=0;
       pos2=0;
-      digitalWrite(led, HIGH);
     }
     inputString="";
   }

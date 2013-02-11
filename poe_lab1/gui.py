@@ -64,14 +64,15 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
             r=self.serial.read(1)
             if(r=='\n'):
                 [[pos1,pos2,light]]=re.findall("(.*)\|(.*)\|(.*)", self.tempdata.strip())
-                self.data[0].append(pos1)       #set values to the buttons:
-                self.data[1].append(pos2)
-                self.data[2].append(light)
+                if(self.is_numeric(pos1) and self.is_numeric(pos2) and self.is_numeric(light)):
+                    self.data[0].append(pos1)       #set values to the buttons:
+                    self.data[1].append(pos2)
+                    self.data[2].append(light)
+                print self.tempdata
                 self.tempdata=""
             elif(r=='@'):
                 self.timer.stop()
                 self.status.setText("Scan successful!")     #displays message when scann is successful
-                #print self.data
             else:
                 self.tempdata+=r        #does nothing if scan wasn't successful.
 
@@ -121,13 +122,15 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
         self.data[2]=map(int, self.data[2])
         for i in range(len(self.data[0])):
             if(self.data[1][i]>90):
-                self.data[1][i]=180-self.data[1][i]
+                self.data[1][i]-=90
                 self.data[0][i]+=180
-            self.data[1][i]-=90
+            else:
+                self.data[1][i]=90-self.data[1][i]
             if(self.data[2][i]<0):
                 self.data[2][i]=0
             elif(self.data[2][i]>100):
                 self.data[2][i]=100
+            self.data[2][i]=100-self.data[2][i]
 
     def is_numeric(self, s):        #checks to make sure GUI field entries are integers when called:
         try:

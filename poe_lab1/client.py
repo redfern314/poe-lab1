@@ -52,16 +52,18 @@ def findAvailPorts():
 def showHeatMap(data):      #code to produce a graph of the intensity of light around the room.
     r=np.array(data[1])     #radius from polar coordinate position sent from Arduino.
     theta=np.array(data[0]) #angle position, sent from arduino.
-    x=r*np.cos(theta)       #converting to rectangular:
-    y=r*np.sin(theta)
+    x=r*np.cos(np.pi/180*theta)       #converting to rectangular:
+    y=r*np.sin(np.pi/180*theta)
     xmin = x.min()      #setting axies bounds:
     xmax = x.max()
     ymin = y.min()
     ymax = y.max()
     plt.subplots_adjust(hspace=0.5)     #setting the third dimension of the plot, intensity:
     plt.subplot(111)
-    plt.hexbin(x,y,C=data[2], cmap=plt.cm.hot)
+    plt.hexbin(x,y,C=data[2], cmap=plt.cm.hsv)
     plt.axis([xmin, xmax, ymin, ymax])
+    plt.xlabel("x position")
+    plt.ylabel("y position")
     plt.title("Light Source Heat Map")
     cb = plt.colorbar()
     cb.set_label('counts')
