@@ -120,6 +120,11 @@ class Form(QDialog):
             if(self.data[1][i]>90):
                 self.data[1][i]=180-self.data[1][i]
                 self.data[0][i]+=180
+            self.data[1][i]-=90
+            if(self.data[2][i]<0):
+                self.data[2][i]=0
+            elif(self.data[2][i]>100):
+                self.data[2][i]=100
 
     def is_numeric(self, s):
         try:
