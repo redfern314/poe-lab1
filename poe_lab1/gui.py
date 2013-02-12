@@ -1,5 +1,6 @@
-#code to create a GUI for a room light sensing device which allows the user to control the precision and 
-# angle of the scan and abort it. It also gives them a button to connect to the arduino.
+#code to create a GUI for a room light sensing device which allows 
+# the user to control the precision of the scan and abort it. 
+# It also gives them a button to connect to the arduino.
 
 import sys      #inport libraries:
 from PySide.QtCore import *
@@ -7,14 +8,13 @@ from PySide.QtGui import *
 import client
 import re
 
-class Form(QDialog):        #sets the form for the GUI which will be created later.
+class Form(QDialog):        #GUI class
    
     def __init__(self, parent=None):
         super(Form, self).__init__(parent)
         # Create widgets
         self.setWindowTitle('Pan and Tilt Scan')
-        self.precision = QLineEdit("1")
-        self.angle = QLineEdit("90")
+        self.precision = QLineEdit("10")
         self.start = QPushButton("Start Scan")
         self.abort = QPushButton("Abort Scan")   
         self.start.setEnabled(False)
@@ -28,15 +28,12 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
         layout3 = QHBoxLayout()
         layout4 = QHBoxLayout()
         label1 = QLabel("Scan step size:\n(1<=x<=50)")
-        label2 = QLabel("Maximum scan angle:\n(0<=x<=90)")
         self.status = QLabel("Status: Waiting for connection")
         mainlayout.addLayout(layout1)
         mainlayout.addLayout(layout2)
         mainlayout.addLayout(layout3)
         layout1.addWidget(label1)
         layout1.addWidget(self.precision,alignment=Qt.AlignRight)
-        layout2.addWidget(label2)
-        layout2.addWidget(self.angle,alignment=Qt.AlignRight)
         layout3.addWidget(self.start)
         layout3.addWidget(self.abort)
         layout4.addWidget(self.arduinoConnect)
@@ -59,13 +56,13 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
         self.tempdata = ""
         self.data = [[],[],[]]
 
-    def readData(self):     #creates the GUI based on the form created above:
+    def readData(self): #reads data from the serial port
         while self.serial.inWaiting()>0:
             r=self.serial.read(1)
             if(r=='\n'):
                 [[pos1,pos2,light]]=re.findall("(.*)\|(.*)\|(.*)", self.tempdata.strip())
                 if(self.is_numeric(pos1) and self.is_numeric(pos2) and self.is_numeric(light)):
-                    self.data[0].append(pos1)       #set values to the buttons:
+                    self.data[0].append(pos1)
                     self.data[1].append(pos2)
                     self.data[2].append(light)
                 print self.tempdata
@@ -77,7 +74,7 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
                 self.tempdata+=r        #does nothing if scan wasn't successful.
 
     def connectToArduino(self):
-        s=client.connectToArduino()             #code to connect to arduino when the connect button is pushed. Also aborts when the abort button is pushed:
+        s=client.connectToArduino() #code to connect to arduino when the connect button is pushed. Also aborts when the abort button is pushed:
         if(s!=None):
             self.status.setText("Status: Connected!")
             self.start.setEnabled(True)
@@ -87,20 +84,18 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
     def startScan(self):        #starts the scan when the start scan button is pushed:
         #validate fields
         precision_text=str(self.precision.text())
-        angle_text=str(self.angle.text())
-        if((not self.is_numeric(precision_text)) or (not self.is_numeric(angle_text))):         #checks entries into GUI fields for compatibility:
+        if(not self.is_numeric(precision_text)):         #checks entries into GUI fields for compatibility:
             msgBox=QMessageBox()
             msgBox.setText("Please enter valid numeric values.")
             msgBox.exec_()
         else:
             precision=int(precision_text)
-            angle=int(angle_text)
-            if(precision<1 or precision>50 or angle<0 or angle>90):
+            if(precision<1 or precision>50):
                 msgBox=QMessageBox()
                 msgBox.setText("Please enter valid values.")
                 msgBox.exec_()
             else:
-                cmd="1"+"{0:02d}".format(precision)+"{0:02d}".format(angle)+'\n'        #If entries are corrects, begins cand and displays message telling user it's scanning:
+                cmd="1"+"{0:02d}".format(precision)+'\n'        #If entries are corrects, begins scan and displays message telling user it's scanning:
                 print cmd.strip()
                 self.serial.write(cmd)
                 self.tempdata = ""
@@ -108,15 +103,17 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
                 self.timer.start(10)
                 self.status.setText("Scanning......")
 
-    def abortScan(self):        # aborts scann if abort utton is pushed and it is called:
+    # aborts scan if abort button is pushed
+    def abortScan(self):        
         self.serial.write("0\n")
         self.status.setText("ABORT")
 
-    def makePlot(self):         #Makes plot when called:
+    def makePlot(self):         #Makes plot when called
         self.parseAngles()
         client.showHeatMap(self.data)
 
-    def parseAngles(self):      #turns the angle data recieved from the servo into something inteligable for the graph:
+    #parses the angle data recieved from the servo
+    def parseAngles(self):      
         self.data[0]=map(int, self.data[0])
         self.data[1]=map(int, self.data[1])
         self.data[2]=map(int, self.data[2])
@@ -132,7 +129,8 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
                 self.data[2][i]=100
             self.data[2][i]=100-self.data[2][i]
 
-    def is_numeric(self, s):        #checks to make sure GUI field entries are integers when called:
+    #checks to make sure s is numeric
+    def is_numeric(self, s):
         try:
             int(s)
             return True
@@ -140,7 +138,7 @@ class Form(QDialog):        #sets the form for the GUI which will be created lat
             return False
  
  
-if __name__ == '__main__':          #Runs when you run the file. The main function:
+if __name__ == '__main__':  #Runs when you run the file. The main function:
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form

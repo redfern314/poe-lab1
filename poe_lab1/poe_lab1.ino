@@ -1,5 +1,5 @@
 /*Setup functions for a semi-sphere room sweep which detects the ambient light of its suroundings 
-using a photoresistor. This interfaces with a Python 3 GUI and code which produces a graph in Python.
+using a photoresistor. This interfaces with a Python 2 GUI and code which produces a graph in Python.
 
 Derek Redfern & Halie Murray-Davis
 */
@@ -50,29 +50,29 @@ void setup() {
 }
 
 void movement(){        //define a function which will move the servos in a specified pattern.
-  for(pos==0; pos<=180; pos = pos + round(precision/9)) {    //Step through an arch for the bottom servo.
+  for(pos==0; pos<=180; pos = pos + 1) {    //Step through an arch for the bottom servo.
     servo1.write(pos);
-    delay (50/precision);
+    delay (5);
     returndata();
         if ((pos==0 || pos==180)){    //move the photo resistor up a step (size of which is determined by the percision value) at ends of arc.
             delay (70);
             pos2=pos2+precision;
             servo2.write(pos2);
-            delay (30);
+            delay (10);
             returndata();
         }
     }
     
-  for (pos==180; pos>=0; pos = pos - round(precision/9)) {     //this case accomplishes movement in the opposite direction
+  for (pos==180; pos>0; pos = pos - 1) {     //this case accomplishes movement in the opposite direction
     servo1.write(pos);
-    delay (50/precision);
+    delay (5);
     returndata();
-      /*if (pos==0)  {
+      if (pos==0)  {
         pos2=pos2+precision;
         servo2.write(pos2);
-        delay (30);
+        delay (10);
         returndata();
-      }*/
+      }
   }
   if(pos2>=180) {
     pos=0;
@@ -85,7 +85,7 @@ void movement(){        //define a function which will move the servos in a spec
 }
 
 void returndata(){      //sets up a function which writes data to the serial port so we can use it in the python code to make a graph.
-    int light=map(analogRead(photoresistor), 900, 1000, 0, 100);    //reads the light from the photoresistor.
+    int light=map(analogRead(photoresistor), 500, 1023, 0, 100);    //reads the light from the photoresistor.
     Serial.print(pos);
     Serial.print("|");
     Serial.print(pos2);
@@ -100,8 +100,8 @@ void loop(){
     if(inputString[0]=='0') {
       runScan=false;
     } else if(inputString[0]=='1') {
-      //TODO: extract new vars
-      
+      String str1 = String(inputString);
+      precision = str1.substring(1,3).toInt();
       runScan=true;
       pos=0;
       pos2=0;

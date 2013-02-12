@@ -62,8 +62,6 @@ def showHeatMap(data):      #code to produce a graph of the intensity of light a
     plt.subplot(111)
     plt.hexbin(x,y,C=data[2], cmap=plt.cm.hsv)
     plt.axis([xmin, xmax, ymin, ymax])
-    plt.xlabel("x position")
-    plt.ylabel("y position")
     plt.title("Light Source Heat Map")
     cb = plt.colorbar()
     cb.set_label('counts')
